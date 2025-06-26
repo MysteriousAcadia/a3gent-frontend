@@ -58,4 +58,34 @@ const sendChatMessage = async (message) => {
   );
   return response.data;
 };
-export { getAccount, topup, getChatHistory, sendChatMessage };
+const addTool = async (toolData) => {
+  const token = await getIdToken(auth.currentUser);
+  const response = await axios.post(`${baseURL}/user/addTool`, toolData, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};
+const searchTools = async (query, myTools = false) => {
+  const token = await getIdToken(auth.currentUser);
+  const response = await axios.get(
+    `${baseURL}/user/tools/search?q=${query}&myTools=${myTools}`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data.data.tools;
+};
+export {
+  getAccount,
+  topup,
+  getChatHistory,
+  sendChatMessage,
+  addTool,
+  searchTools,
+};
