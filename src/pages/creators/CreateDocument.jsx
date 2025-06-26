@@ -1,26 +1,30 @@
 import React, { useState } from "react";
 import Sidebar from "../../components/Sidebar";
-import ApiForm from "../../components/ApiForm";
+import DocumentForm from "../../components/DocumentForm";
 import { useNavigate } from "react-router";
 
-export default function CreateAPI() {
+export default function CreateDocument() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleCreate = async (data) => {
     setLoading(true);
     try {
+      const formData = new FormData();
+      formData.append("title", data.title);
+      formData.append("description", data.description);
+      formData.append("categories", JSON.stringify(data.categories));
+      formData.append("file", data.file);
+      formData.append("price", data.price);
       // Replace with your actual REST endpoint
-      await fetch("/api/apis", {
+      await fetch("/api/documents", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: formData,
       });
-      // Show toast (replace with your toast library if needed)
-      window.alert("API created successfully!");
+      window.alert("Document created successfully!");
       navigate("/creators/dashboard");
     } catch (err) {
-      window.alert("Failed to create API");
+      window.alert("Failed to create document");
     } finally {
       setLoading(false);
     }
@@ -31,8 +35,10 @@ export default function CreateAPI() {
       <Sidebar />
       <main className="flex-1 flex items-center justify-center md:ml-64 p-8">
         <div className="w-full max-w-2xl">
-          <h1 className="text-3xl font-bold text-white mb-8">Create New API</h1>
-          <ApiForm onSubmit={handleCreate} loading={loading} />
+          <h1 className="text-3xl font-bold text-white mb-8">
+            Create New Document
+          </h1>
+          <DocumentForm onSubmit={handleCreate} loading={loading} />
         </div>
       </main>
     </div>

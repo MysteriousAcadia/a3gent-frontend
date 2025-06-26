@@ -1,18 +1,33 @@
 import React from "react";
 import { ArrowRight, Sparkles, Search, Bot } from "lucide-react";
+import { useNavigate } from "react-router";
+import { signInWithGoogle } from "../utils/firebase";
+import { useAuth } from "../contexts/AuthContext";
 import Sidebar from "../components/Sidebar";
 
 export default function Landing() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
   // Placeholder sign-in handlers
   const handleSignInGoogle = () => alert("Google sign-in coming soon!");
   const handleSignInEmail = () => alert("Email sign-in coming soon!");
 
+  const handleMonetizeClick = async (e) => {
+    e.preventDefault();
+    if (!user) {
+      const result = await signInWithGoogle();
+      if (result.user) {
+        navigate("/creators/dashboard");
+      }
+      // Optionally handle error
+    } else {
+      navigate("/creators/dashboard");
+    }
+  };
+
   return (
     <div className="min-h-screen min-w-full bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-800 flex">
-      {/* <Sidebar
-        onSignInGoogle={handleSignInGoogle}
-        onSignInEmail={handleSignInEmail}
-      /> */}
       <main className="w-full flex flex-col items-center justify-between px-8 py-0 animate-fade-in min-h-screen">
         {/* Hero Section */}
         <section className="flex flex-col flex-grow justify-center items-center w-full h-full text-center pt-24 pb-12 animate-fade-in-up">
@@ -28,19 +43,19 @@ export default function Landing() {
           </p>
           <div className="flex flex-col md:flex-row gap-8 justify-center mb-20 animate-fade-in">
             <a
-              href="#explore"
+              href="/consumers/view-apis"
               className="inline-flex items-center px-10 py-5 bg-fuchsia-600 hover:bg-fuchsia-700 text-white font-bold rounded-2xl shadow-2xl transition-all duration-200 text-xl animate-bounce"
             >
               Explore Marketplace <Search className="ml-3 w-6 h-6" />
             </a>
-            <a
-              href="#monetize"
+            <button
+              onClick={handleMonetizeClick}
               className="inline-flex items-center px-10 py-5 bg-cyan-600 hover:bg-cyan-700 text-white font-bold rounded-2xl shadow-2xl transition-all duration-200 text-xl"
             >
               Monetize Now <ArrowRight className="ml-3 w-6 h-6" />
-            </a>
+            </button>
             <a
-              href="#chat"
+              href="/consumers/chat-agent"
               className="inline-flex items-center px-10 py-5 bg-zinc-800 hover:bg-zinc-700 text-white font-bold rounded-2xl shadow-2xl transition-all duration-200 text-xl"
             >
               Chat with Agent <Bot className="ml-3 w-6 h-6 animate-spin-slow" />
