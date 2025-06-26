@@ -83,7 +83,7 @@ export default function ChatWithAgent() {
             ) : (
               [...messages].reverse().map((msg, i) => (
                 <div
-                  key={i}
+                  key={messages.length - i}
                   className={`flex items-end gap-3 ${
                     msg.sender === "user" ? "justify-end" : "justify-start"
                   }`}
