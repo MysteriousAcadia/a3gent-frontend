@@ -23,12 +23,12 @@ export default function Landing() {
         setShowToast(true);
         setTimeout(() => {
           setShowToast(false);
-          navigate("/creators/dashboard");
+          navigate(path);
         }, 1200);
       }
       // Optionally handle error
     } else {
-      navigate("/creators/dashboard");
+      navigate(path);
     }
   };
 
