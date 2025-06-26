@@ -1,24 +1,30 @@
-import React from "react";
+import React, { useState } from "react";
 import { ArrowRight, Sparkles, Search, Bot } from "lucide-react";
 import { useNavigate } from "react-router";
 import { signInWithGoogle } from "../utils/firebase";
 import { useAuth } from "../contexts/AuthContext";
 import Sidebar from "../components/Sidebar";
+import Toast from "../components/Toast";
 
 export default function Landing() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [showToast, setShowToast] = useState(false);
 
   // Placeholder sign-in handlers
   const handleSignInGoogle = () => alert("Google sign-in coming soon!");
   const handleSignInEmail = () => alert("Email sign-in coming soon!");
 
-  const handleMonetizeClick = async (e) => {
+  const handleMonetizeClick = async (e, path) => {
     e.preventDefault();
     if (!user) {
       const result = await signInWithGoogle();
       if (result.user) {
-        navigate("/creators/dashboard");
+        setShowToast(true);
+        setTimeout(() => {
+          setShowToast(false);
+          navigate("/creators/dashboard");
+        }, 1200);
       }
       // Optionally handle error
     } else {
@@ -42,24 +48,24 @@ export default function Landing() {
             with AI-powered chat.
           </p>
           <div className="flex flex-col md:flex-row gap-8 justify-center mb-20 animate-fade-in">
-            <a
-              href="/consumers/view-apis"
-              className="inline-flex items-center px-10 py-5 bg-fuchsia-600 hover:bg-fuchsia-700 text-white font-bold rounded-2xl shadow-2xl transition-all duration-200 text-xl animate-bounce"
+            <button
+              onClick={(e) => handleMonetizeClick(e, "/consumers/view-apis")}
+              className="cursor-pointer inline-flex items-center px-10 py-5 bg-fuchsia-600 hover:bg-fuchsia-700 text-white font-bold rounded-2xl shadow-2xl transition-all duration-200 text-xl animate-bounce"
             >
               Explore Marketplace <Search className="ml-3 w-6 h-6" />
-            </a>
+            </button>
             <button
-              onClick={handleMonetizeClick}
-              className="inline-flex items-center px-10 py-5 bg-cyan-600 hover:bg-cyan-700 text-white font-bold rounded-2xl shadow-2xl transition-all duration-200 text-xl"
+              onClick={(e) => handleMonetizeClick(e, "/creators/dashboard")}
+              className="cursor-pointer inline-flex items-center px-10 py-5 bg-cyan-600 hover:bg-cyan-700 text-white font-bold rounded-2xl shadow-2xl transition-all duration-200 text-xl"
             >
               Monetize Now <ArrowRight className="ml-3 w-6 h-6" />
             </button>
-            <a
-              href="/consumers/chat-agent"
+            <button
+              onClick={(e) => handleMonetizeClick(e, "/consumers/chat-agent")}
               className="inline-flex items-center px-10 py-5 bg-zinc-800 hover:bg-zinc-700 text-white font-bold rounded-2xl shadow-2xl transition-all duration-200 text-xl"
             >
               Chat with Agent <Bot className="ml-3 w-6 h-6 animate-spin-slow" />
-            </a>
+            </button>
           </div>
         </section>
         {/* Features Section */}
@@ -95,6 +101,11 @@ export default function Landing() {
             </p>
           </div>
         </section>
+        <Toast
+          message="Login successful!"
+          show={showToast}
+          onClose={() => setShowToast(false)}
+        />
       </main>
     </div>
   );

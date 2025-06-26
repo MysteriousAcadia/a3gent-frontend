@@ -3,6 +3,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { getChatHistory, sendChatMessage } from "../../utils/axios";
 import { Bot, User } from "lucide-react";
 import Sidebar from "../../components/Sidebar";
+import MarkdownRenderer from "../../components/MarkdownRenderer";
 
 export default function ChatWithAgent() {
   const { user } = useAuth();
@@ -25,7 +26,7 @@ export default function ChatWithAgent() {
       }
     }
     fetchHistory();
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     if (chatEndRef.current) {
@@ -62,6 +63,19 @@ export default function ChatWithAgent() {
       <main className="flex-1 flex flex-col items-center md:ml-64 p-0">
         <div className="w-full flex flex-col h-screen justify-between">
           <div className="flex-1 overflow-y-auto px-4 pt-8 pb-4 bg-zinc-900/80 rounded-b-2xl animate-fade-in flex flex-col-reverse space-y-reverse space-y-4">
+            {typing && (
+              <div className="flex items-end gap-3 justify-start animate-fade-in">
+                <div className="bg-fuchsia-600 p-2 rounded-full flex items-center justify-center">
+                  <Bot className="w-6 h-6 text-white" />
+                </div>
+                <div className="px-4 py-2 rounded-2xl bg-zinc-800 text-zinc-100 max-w-[70%] shadow-md animate-pulse">
+                  <span className="inline-block w-2 h-2 bg-zinc-400 rounded-full mr-1 animate-bounce"></span>
+                  <span className="inline-block w-2 h-2 bg-zinc-400 rounded-full mr-1 animate-bounce delay-75"></span>
+                  <span className="inline-block w-2 h-2 bg-zinc-400 rounded-full animate-bounce delay-150"></span>
+                </div>
+              </div>
+            )}
+            <div ref={chatEndRef} />
             {loading ? (
               <div className="text-center text-zinc-400 animate-pulse mt-10">
                 Loading chat history...
@@ -86,7 +100,32 @@ export default function ChatWithAgent() {
                         : "bg-zinc-800 text-zinc-100 rounded-bl-none"
                     }`}
                   >
-                    {msg.text}
+                    <MarkdownRenderer
+                      class="prose prose-invert max-w-none"
+                      components={{
+                        code({ node, inline, className, children, ...props }) {
+                          return (
+                            <code
+                              className={
+                                "bg-zinc-900 px-1 rounded text-fuchsia-300 font-mono text-sm"
+                              }
+                              {...props}
+                            >
+                              {children}
+                            </code>
+                          );
+                        },
+                        pre({ node, ...props }) {
+                          return (
+                            <pre className="bg-zinc-900 rounded p-2 overflow-x-auto">
+                              {...props}
+                            </pre>
+                          );
+                        },
+                      }}
+                    >
+                      {msg.text}
+                    </MarkdownRenderer>
                   </div>
                   {msg.sender === "user" && (
                     <div className="bg-zinc-700 p-2 rounded-full flex items-center justify-center">
@@ -96,19 +135,6 @@ export default function ChatWithAgent() {
                 </div>
               ))
             )}
-            {typing && (
-              <div className="flex items-end gap-3 justify-start animate-fade-in">
-                <div className="bg-fuchsia-600 p-2 rounded-full flex items-center justify-center">
-                  <Bot className="w-6 h-6 text-white" />
-                </div>
-                <div className="px-4 py-2 rounded-2xl bg-zinc-800 text-zinc-100 max-w-[70%] shadow-md animate-pulse">
-                  <span className="inline-block w-2 h-2 bg-zinc-400 rounded-full mr-1 animate-bounce"></span>
-                  <span className="inline-block w-2 h-2 bg-zinc-400 rounded-full mr-1 animate-bounce delay-75"></span>
-                  <span className="inline-block w-2 h-2 bg-zinc-400 rounded-full animate-bounce delay-150"></span>
-                </div>
-              </div>
-            )}
-            <div ref={chatEndRef} />
           </div>
           <form
             onSubmit={handleSend}

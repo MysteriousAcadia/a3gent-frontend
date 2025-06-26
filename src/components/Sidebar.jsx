@@ -9,7 +9,7 @@ import {
   Bot,
   Wallet,
 } from "lucide-react";
-import { useLocation } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 
 function getRandomAvatar(name) {
   // Use DiceBear Avatars API for a random avatar based on name
@@ -19,6 +19,7 @@ function getRandomAvatar(name) {
 }
 
 export default function Sidebar() {
+  const navigate = useNavigate();
   const { user, callTopup } = useAuth();
   const location = useLocation();
   const path = location.pathname;
@@ -35,41 +36,41 @@ export default function Sidebar() {
   if (path.startsWith("/creators/")) {
     navOptions = (
       <>
-        <a
-          href="/creators/dashboard"
+        <button
+          onClick={() => navigate("/creators/dashboard")}
           className="flex items-center gap-2 text-zinc-200 hover:text-white py-2 px-3 rounded-lg transition-colors"
         >
           <LayoutDashboard className="w-5 h-5" /> Dashboard
-        </a>
-        <a
-          href="/creators/create-api"
+        </button>
+        <button
+          onClick={() => navigate("/creators/create-api")}
           className="flex items-center gap-2 text-zinc-200 hover:text-white py-2 px-3 rounded-lg transition-colors"
         >
           <PlusCircle className="w-5 h-5" /> Add API
-        </a>
-        <a
-          href="/creators/create-document"
+        </button>
+        <button
+          onClick={() => navigate("/creators/create-document")}
           className="flex items-center gap-2 text-zinc-200 hover:text-white py-2 px-3 rounded-lg transition-colors"
         >
           <FilePlus className="w-5 h-5" /> Add Document
-        </a>
+        </button>
       </>
     );
   } else if (path.startsWith("/consumers/")) {
     navOptions = (
       <>
-        <a
-          href="/consumers/view-apis"
+        <button
+          onClick={() => navigate("/consumers/view-apis")}
           className="flex items-center gap-2 text-zinc-200 hover:text-white py-2 px-3 rounded-lg transition-colors"
         >
           <Search className="w-5 h-5" /> Explore
-        </a>
-        <a
-          href="/consumers/chat-agent"
+        </button>
+        <button
+          onClick={() => navigate("/consumers/chat-agent")}
           className="flex items-center gap-2 text-zinc-200 hover:text-white py-2 px-3 rounded-lg transition-colors"
         >
           <Bot className="w-5 h-5" /> Talk to Agent
-        </a>
+        </button>
         <button
           onClick={async () => {
             await callTopup();
@@ -85,7 +86,12 @@ export default function Sidebar() {
 
   return (
     <aside className="fixed left-0 top-0 h-full w-64 bg-gradient-to-b from-zinc-900 to-zinc-800 shadow-xl flex flex-col items-center py-10 animate-fade-in">
-      <h2 className="text-3xl font-extrabold text-white mb-8 tracking-tight">
+      <h2
+        onClick={() => {
+          navigate("/");
+        }}
+        className=" cursor-pointer text-3xl font-extrabold text-white mb-8 tracking-tight"
+      >
         Ag3nt
       </h2>
       <div className="flex flex-col items-center gap-3 w-full px-6 mb-4">

@@ -48,10 +48,14 @@ export default function JsonStructureTable({ json }) {
         {rows.map((row, i) => (
           <tr key={i} className="border-b border-zinc-700">
             <td className="py-1 px-3 font-mono">
-              <span style={{ paddingLeft: `${row.depth * 16}px` }}>{row.name}</span>
+              <span style={{ paddingLeft: `${row.depth * 16}px` }}>
+                {row.name}
+              </span>
             </td>
             <td className="py-1 px-3">{row.type}</td>
-            <td className="py-1 px-3 font-mono truncate max-w-[200px]">{String(row.example)}</td>
+            <td className="py-1 px-3 font-mono truncate max-w-[200px]">
+              {String(row.example)}
+            </td>
           </tr>
         ))}
       </tbody>

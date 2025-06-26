@@ -7,7 +7,7 @@ export const getBalance = async (address) => {
 
   try {
     const provider = new ethers.JsonRpcProvider(
-      "https://eth-sepolia.g.alchemy.com/v2/demo"
+      "https://base-sepolia-rpc.publicnode.com"
     );
     const balance = await provider.getBalance(address);
     console.log("Balance in wei:", balance.toString());

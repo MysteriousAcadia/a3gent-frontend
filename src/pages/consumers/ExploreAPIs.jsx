@@ -74,25 +74,7 @@ export default function ExploreAPIs() {
 
   return (
     <div className="min-h-screen flex bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-800">
-      <Sidebar>
-        <nav className="mt-10 flex flex-col gap-2 w-full px-6">
-          <a
-            href="/creators/dashboard"
-            className="flex items-center gap-2 text-zinc-200 hover:text-white py-2 px-3 rounded-lg transition-colors"
-          >
-            <LayoutDashboard className="w-5 h-5" /> Dashboard
-          </a>
-          <button className="flex items-center gap-2 text-zinc-200 hover:text-white py-2 px-3 rounded-lg transition-colors">
-            <Wallet className="w-5 h-5" /> Top Up Wallet
-          </button>
-          <a
-            href="/consumers/chat-agent"
-            className="flex items-center gap-2 text-zinc-200 hover:text-white py-2 px-3 rounded-lg transition-colors"
-          >
-            <Bot className="w-5 h-5" /> Chat with Agent
-          </a>
-        </nav>
-      </Sidebar>
+      <Sidebar />
       <main className="flex-1 flex flex-col items-center md:ml-64 p-8">
         <div className="w-full max-w-3xl flex flex-col items-center gap-8 mt-8">
           <div className="w-full flex flex-col md:flex-row gap-4 items-center justify-between">

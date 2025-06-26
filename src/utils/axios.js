@@ -39,7 +39,14 @@ const getChatHistory = async () => {
       Authorization: `Bearer ${token}`,
     },
   });
-  return response.data;
+  // Transform messages to [{user:"user",text:message},{user:"agent",text:response}]
+  const messages = response.data.data.messages.flatMap(
+    ({ message, response }) => [
+      { sender: "user", text: message },
+      { sender: "agent", text: response },
+    ]
+  );
+  return messages;
 };
 
 const sendChatMessage = async (message) => {
@@ -81,6 +88,25 @@ const searchTools = async (query, myTools = false) => {
   );
   return response.data.data.tools;
 };
+const executeTool = async (toolId, parameters = {}, sessionId = "") => {
+  const token = await getIdToken(auth.currentUser);
+  const response = await axios.post(
+    `${baseURL}/user/tools/execute`,
+    {
+      toolId,
+      parameters,
+      sessionId,
+    },
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
 export {
   getAccount,
   topup,
