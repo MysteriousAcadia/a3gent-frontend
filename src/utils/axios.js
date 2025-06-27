@@ -91,11 +91,18 @@ const searchTools = async (query, myTools = false) => {
 const executeTool = async (toolId, parameters = {}, sessionId = "") => {
   const token = await getIdToken(auth.currentUser);
   const response = await axios.post(
-    `${baseURL}/user/tools/execute`,
+    `${baseURL}/user/tools/external-execute`,
     {
-      toolId,
-      parameters,
-      sessionId,
+      url: `${baseURL}/user/tools/execute`,
+      body: {
+        toolId,
+        parameters,
+        sessionId,
+      },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
     },
     {
       headers: {
@@ -114,4 +121,5 @@ export {
   sendChatMessage,
   addTool,
   searchTools,
+  executeTool,
 };

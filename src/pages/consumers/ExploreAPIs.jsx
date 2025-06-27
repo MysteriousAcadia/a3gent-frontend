@@ -8,8 +8,9 @@ import {
   Bot,
   LayoutDashboard,
 } from "lucide-react";
-import { searchTools } from "../../utils/axios";
+import { searchTools, executeTool } from "../../utils/axios";
 import { useAuth } from "../../contexts/AuthContext";
+import { Dialog } from "@headlessui/react";
 
 function ShimmerCard() {
   return (
@@ -24,12 +25,115 @@ function ShimmerCard() {
   );
 }
 
+function ExecuteDialog({ open, onClose, api, onResult }) {
+  const [inputs, setInputs] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState(null);
+  const [error, setError] = useState("");
+
+  if (!api) return null;
+  console.log(api);
+  const params = api.parameters || [];
+
+  const handleChange = (e, param) => {
+    setInputs((prev) => ({ ...prev, [param]: e.target.value }));
+  };
+
+  const handleExecute = async () => {
+    setLoading(true);
+    setError("");
+    setResult(null);
+    try {
+      const res = await executeTool(api.toolId, inputs);
+      setResult(res.data?.output || res.output || res.data);
+      onResult && onResult(res);
+    } catch (e) {
+      // If 402, show error response body (payment info)
+      if (e?.response?.status === 402 && e.response.data) {
+        setError(null);
+        setResult(e.response.data); // Show payment data in result area
+      } else {
+        setError("Failed to execute API");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Dialog
+      open={open}
+      onClose={onClose}
+      className="fixed z-50 inset-0 flex items-center justify-center"
+    >
+      <div className="fixed inset-0 bg-black/60" aria-hidden="true" />
+      <div className="relative bg-zinc-900 rounded-2xl p-8 w-full max-w-lg mx-auto z-10 flex flex-col gap-4">
+        <Dialog.Title className="text-xl font-bold text-white mb-2">
+          Execute {api.name}
+        </Dialog.Title>
+        <div className="flex flex-col gap-3">
+          {params.length === 0 && (
+            <div className="text-zinc-400">No input parameters required.</div>
+          )}
+          {params.map((param) => (
+            <div key={param} className="flex flex-col gap-1">
+              <label className="text-zinc-300 font-semibold">
+                {param.name}
+              </label>
+              <input
+                className="px-3 py-2 rounded bg-zinc-800 text-white border border-zinc-700 focus:ring-fuchsia-500 focus:outline-none"
+                value={inputs[param.name] || ""}
+                onChange={(e) => handleChange(e, param.name)}
+                placeholder={`Enter ${param.name}`}
+              />
+            </div>
+          ))}
+        </div>
+        <button
+          className="mt-4 px-6 py-2 bg-fuchsia-600 hover:bg-fuchsia-700 text-white rounded-lg font-semibold disabled:opacity-60"
+          onClick={handleExecute}
+          disabled={loading}
+        >
+          {loading ? "Executing..." : "Execute"}
+        </button>
+        {result && (
+          <div className="mt-4 bg-zinc-800 rounded p-4 text-zinc-100">
+            <div className="font-bold text-fuchsia-400 mb-2">Output:</div>
+            <pre className="whitespace-pre-wrap  overflow-scroll max-h-64 break-all text-sm">
+              {JSON.stringify(result, null, 2)}
+            </pre>
+            {result.cost && (
+              <>
+                <div className="mt-2 text-cyan-400">
+                  Cost: {result.cost} ETH
+                </div>
+                <div className="mt-2 text-green-400 font-semibold">
+                  Fees have been deducted from your wallet.
+                </div>
+              </>
+            )}
+          </div>
+        )}
+        {error && <div className="text-red-400 mt-2">{error}</div>}
+        <button
+          className="absolute top-2 right-4 text-zinc-400 hover:text-white"
+          onClick={onClose}
+        >
+          ✕
+        </button>
+      </div>
+    </Dialog>
+  );
+}
+
 export default function ExploreAPIs() {
   const [search, setSearch] = useState("");
   const [tab, setTab] = useState("apis");
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
   const [noData, setNoData] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogApi, setDialogApi] = useState(null);
   const { user } = useAuth();
 
   // Fetch all data on mount
@@ -134,7 +238,7 @@ export default function ExploreAPIs() {
               <div className="grid gap-4">
                 {data.map((item, idx) => (
                   <div
-                    key={idx}
+                    key={item._id || idx}
                     className="bg-zinc-800 rounded-xl p-6 shadow-md flex flex-col gap-2 animate-fade-in"
                   >
                     <div className="font-bold text-lg text-white">
@@ -153,6 +257,17 @@ export default function ExploreAPIs() {
                         </span>
                       ))}
                     </div>
+                    {tab === "apis" && (
+                      <button
+                        className="mt-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg font-semibold w-fit"
+                        onClick={() => {
+                          setDialogApi(item);
+                          setDialogOpen(true);
+                        }}
+                      >
+                        Execute
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>
@@ -160,6 +275,11 @@ export default function ExploreAPIs() {
           </div>
         </div>
       </main>
+      <ExecuteDialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        api={dialogApi}
+      />
     </div>
   );
 }

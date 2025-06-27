@@ -50,7 +50,7 @@ export default function Landing() {
           <div className="flex flex-col md:flex-row gap-8 justify-center mb-20 animate-fade-in">
             <button
               onClick={(e) => handleMonetizeClick(e, "/consumers/view-apis")}
-              className="cursor-pointer inline-flex items-center px-10 py-5 bg-fuchsia-600 hover:bg-fuchsia-700 text-white font-bold rounded-2xl shadow-2xl transition-all duration-200 text-xl animate-bounce"
+              className="cursor-pointer inline-flex items-center px-10 py-5 bg-fuchsia-600 hover:bg-fuchsia-700 text-white font-bold rounded-2xl shadow-2xl transition-all duration-200 text-xl"
             >
               Explore Marketplace <Search className="ml-3 w-6 h-6" />
             </button>
